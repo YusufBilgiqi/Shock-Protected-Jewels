@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shock Protected Jewels · Incabloc &amp; Kif</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Dark ruby palette — contrast-corrected throughout */
+  --bg:#0d0608;
+  --surface:#180d10;
+  --card:#211319;
+  --card2:#281820;
+  --border:rgba(200,100,100,.09);
+  --border2:rgba(200,100,100,.18);
+
+  /* Text: all values checked for ≥4.5:1 contrast on their backgrounds */
+  --bright:#f4ecea;        /* headings — near white warm */
+  --text:#d4c4bc;          /* body copy — readable warm grey */
+  --sub:#b89898;           /* secondary text — sidebar items, labels */
+  --dim:#8a6a6a;           /* tertiary — section group labels, footnotes */
+
+  /* Accent colours */
+  --ruby:#d04858;
+  --ruby-dim:rgba(208,72,88,.11);
+  --ruby-mid:rgba(208,72,88,.22);
+  --gold:#d4a04a;
+  --gold-dim:rgba(212,160,74,.11);
+  --sage:#6a9870;
+  --sage-dim:rgba(106,152,112,.11);
+  --sky:#5888b0;
+  --sky-dim:rgba(88,136,176,.11);
+  --rose:#e07080;
+  --rose-dim:rgba(224,112,128,.11);
+
+  --sw:272px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Cormorant Garamond',serif;
+  font-weight:300;
+  font-size:16px;
+  line-height:1.78;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 60% 25% at 50% -5%,rgba(208,72,88,.07) 0%,transparent 65%);
+  pointer-events:none;z-index:0;
+}
+
+.app{display:grid;grid-template-columns:var(--sw) 1fr;height:100vh;overflow:hidden;position:relative;z-index:1;}
+
+/* ─── SIDEBAR ─── */
+.sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sb-head{padding:22px 18px 0;flex-shrink:0;}
+.sb-gem{
+  width:24px;height:24px;margin-bottom:10px;
+  background:linear-gradient(135deg,var(--ruby) 0%,#8a1828 60%,#4a0810 100%);
+  clip-path:polygon(50% 0%,100% 35%,80% 100%,20% 100%,0% 35%);
+  box-shadow:0 0 10px rgba(208,72,88,.35);
+}
+.sb-title{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--bright);line-height:1.3;letter-spacing:.4px;margin-bottom:3px;}
+.sb-sub{font-family:'DM Mono',monospace;font-size:8px;color:var(--sub);letter-spacing:2px;text-transform:uppercase;line-height:1.6;}
+.sb-rule{height:1px;background:linear-gradient(90deg,var(--ruby-mid),transparent);margin:14px 0 6px;}
+
+.sb-nav{flex:1;overflow-y:auto;padding:0 10px 12px;}
+.sb-nav::-webkit-scrollbar{width:2px;}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(208,72,88,.25);}
+
+.sb-grp{
+  font-family:'DM Mono',monospace;font-size:8px;
+  letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--ruby);padding:14px 8px 5px;
+  /* NOT dimmed — section labels must be visible */
+}
+.sb-item{
+  padding:7px 10px;border-radius:3px;cursor:pointer;
+  font-family:'Cormorant Garamond',serif;font-size:13.5px;
+  color:var(--sub);  /* #b89898 — readable on #180d10 */
+  display:flex;align-items:flex-start;gap:8px;
+  transition:all .13s;line-height:1.35;
+}
+.sb-item:hover{background:var(--ruby-dim);color:var(--text);}
+.sb-item.active{background:var(--ruby-mid);color:var(--bright);font-weight:600;}
+.sb-n{font-family:'DM Mono',monospace;font-size:8.5px;color:var(--dim);flex-shrink:0;margin-top:2px;}
+.sb-item.active .sb-n{color:var(--ruby);}
+
+.sb-foot{padding:12px 18px;border-top:1px solid var(--border2);flex-shrink:0;}
+.sb-foot p{font-size:10px;color:var(--sub);line-height:1.7;font-family:'DM Mono',monospace;}
+
+/* ─── MAIN ─── */
+.main{overflow-y:auto;}
+.main::-webkit-scrollbar{width:3px;}
+.main::-webkit-scrollbar-thumb{background:rgba(208,72,88,.18);}
+
+.panel{display:none;padding:38px 46px 70px;max-width:860px;}
+.panel.active{display:block;}
+
+/* Page header */
+.ph{margin-bottom:28px;}
+.ph-eye{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--ruby);margin-bottom:12px;}
+.ph h1{font-family:'Cinzel',serif;font-size:31px;font-weight:700;color:var(--bright);line-height:1.1;margin-bottom:10px;letter-spacing:.4px;}
+.ph h1 em{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;color:var(--ruby);font-size:33px;}
+.ph p{font-size:15.5px;color:var(--text);max-width:630px;line-height:1.82;}
+.ph-rule{height:1px;background:linear-gradient(90deg,rgba(208,72,88,.4),rgba(212,160,74,.12),transparent);margin-top:22px;}
+
+/* Section divider */
+.sdiv{display:flex;align-items:center;gap:12px;margin:28px 0 14px;}
+.sdiv-tag{
+  font-family:'DM Mono',monospace;font-size:7.5px;
+  background:var(--ruby-dim);color:var(--ruby);
+  border:1px solid rgba(208,72,88,.22);border-radius:2px;
+  padding:2px 7px;flex-shrink:0;letter-spacing:2px;text-transform:uppercase;
+}
+.sdiv-line{flex:1;height:1px;background:var(--border2);}
+.sdiv-text{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--sub);flex-shrink:0;}
+
+/* Prose */
+.prose{font-size:15.5px;color:var(--text);line-height:1.85;margin:10px 0;}
+.prose strong{color:var(--bright);font-weight:600;}
+
+/* Callout */
+.callout{
+  border-left:2px solid var(--ruby);
+  padding:12px 16px;background:var(--ruby-dim);
+  border-radius:0 4px 4px 0;margin:12px 0;
+  font-size:14.5px;color:var(--text);line-height:1.78;
+}
+.callout.gold{border-color:var(--gold);background:var(--gold-dim);}
+.callout.sage{border-color:var(--sage);background:var(--sage-dim);}
+.callout.sky{border-color:var(--sky);background:var(--sky-dim);}
+.callout strong{color:var(--bright);font-weight:600;}
+
+/* Warning */
+.warn{
+  background:var(--ruby-dim);
+  border:1px solid rgba(208,72,88,.2);
+  border-radius:4px;padding:13px 16px;
+  margin:12px 0;display:flex;gap:10px;
+}
+.warn-icon{color:var(--ruby);flex-shrink:0;font-size:13px;margin-top:3px;}
+.warn-text{font-size:14.5px;color:var(--text);line-height:1.75;}
+.warn-text strong{color:var(--rose);font-weight:600;}
+
+/* Step list */
+.step-list{display:flex;flex-direction:column;gap:6px;margin:13px 0;}
+.step-item{
+  display:flex;gap:14px;
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:4px;padding:12px 16px;align-items:flex-start;
+}
+.step-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--ruby);min-width:22px;margin-top:3px;flex-shrink:0;}
+.step-title{
+  font-size:12px;color:var(--bright);font-weight:600;
+  margin-bottom:4px;line-height:1.35;
+  font-family:'Cinzel',serif;letter-spacing:.3px;
+}
+.step-detail{font-size:14.5px;color:var(--text);line-height:1.75;}
+.step-detail strong{color:var(--bright);font-weight:600;}
+
+/* Card grid */
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:7px;margin:13px 0;}
+.cg-card{background:var(--card);border:1px solid var(--border2);border-radius:4px;overflow:hidden;}
+.cg-head{padding:8px 13px;font-family:'DM Mono',monospace;font-size:7.5px;font-weight:400;letter-spacing:2px;text-transform:uppercase;}
+.cg-head.ruby{background:var(--ruby-dim);color:var(--ruby);border-bottom:1px solid rgba(208,72,88,.14);}
+.cg-head.gold{background:var(--gold-dim);color:var(--gold);border-bottom:1px solid rgba(212,160,74,.14);}
+.cg-head.sage{background:var(--sage-dim);color:var(--sage);border-bottom:1px solid rgba(106,152,112,.14);}
+.cg-head.sky{background:var(--sky-dim);color:var(--sky);border-bottom:1px solid rgba(88,136,176,.14);}
+.cg-head.rose{background:var(--rose-dim);color:var(--rose);border-bottom:1px solid rgba(224,112,128,.14);}
+/* card body text: var(--text) = #d4c4bc — clearly readable */
+.cg-body{padding:11px 13px;font-size:14.5px;color:var(--text);line-height:1.75;}
+.cg-body strong{color:var(--bright);}
+
+/* Component table */
+.ct{width:100%;border-collapse:collapse;margin:13px 0;}
+.ct thead tr{border-bottom:1px solid var(--border2);}
+.ct th{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ruby);padding:9px 14px;text-align:left;}
+.ct td{padding:9px 14px;border-bottom:1px solid var(--border);font-size:14.5px;color:var(--text);vertical-align:top;line-height:1.7;}
+.ct tr:last-child td{border-bottom:none;}
+.ct tr:hover td{background:var(--card2);}
+.ct td:first-child{font-family:'DM Mono',monospace;font-size:11px;color:var(--ruby);}
+.ct td strong{color:var(--bright);font-weight:600;}
+
+/* Comparison table */
+.cmpr{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:13px 0;}
+.cmpr-card{background:var(--card);border:1px solid var(--border2);border-radius:4px;overflow:hidden;}
+.cmpr-head{padding:9px 13px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.5px;color:var(--bright);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;}
+.cmpr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cmpr-body{padding:12px 13px;font-size:14px;color:var(--text);line-height:1.75;}
+.cmpr-body strong{color:var(--bright);}
+.cmpr-body ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.cmpr-body li{display:flex;gap:8px;}
+.cmpr-body li::before{content:'·';color:var(--ruby);flex-shrink:0;}
+
+/* Parts ordering box */
+.parts-box{background:var(--card);border:1px solid var(--border2);border-radius:4px;padding:16px;margin:13px 0;}
+.parts-title{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ruby);margin-bottom:12px;}
+.parts-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.parts-item{background:var(--card2);border-radius:3px;padding:10px 12px;border:1px solid var(--border);}
+.parts-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin-bottom:5px;}
+.parts-desc{font-size:14px;color:var(--text);line-height:1.65;}
+
+/* Mobile */
+.hamburger{display:none;position:fixed;top:14px;left:14px;z-index:100;background:var(--card);border:1px solid var(--border2);border-radius:3px;padding:8px 10px;cursor:pointer;color:var(--ruby);font-size:16px;}
+@media(max-width:820px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{position:fixed;left:-100%;top:0;height:100vh;width:272px;z-index:99;transition:left .25s;}
+  .sidebar.open{left:0;}
+  .hamburger{display:block;}
+  .panel{padding:22px 18px 60px;}
+  .main{padding-top:50px;}
+  .cmpr{grid-template-columns:1fr;}
+  .parts-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+<div class="app">
+
+<aside class="sidebar">
+  <div class="sb-head">
+    <div class="sb-gem"></div>
+    <div class="sb-title">Shock Protected<br>Jewels</div>
+    <div class="sb-sub">Incabloc · Kif · Parts Ordering</div>
+    <div class="sb-rule"></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-grp">Overview</div>
+    <div class="sb-item active" onclick="nav(this,'p0')"><span class="sb-n">01</span>Why Shock Protection?</div>
+    <div class="sb-item" onclick="nav(this,'p1')"><span class="sb-n">02</span>How All Systems Work</div>
+
+    <div class="sb-grp">Incabloc System</div>
+    <div class="sb-item" onclick="nav(this,'p2')"><span class="sb-n">03</span>Components</div>
+    <div class="sb-item" onclick="nav(this,'p3')"><span class="sb-n">04</span>The Retaining Spring</div>
+    <div class="sb-item" onclick="nav(this,'p4')"><span class="sb-n">05</span>End Shake &amp; Diagnosis</div>
+
+    <div class="sb-grp">Kif System</div>
+    <div class="sb-item" onclick="nav(this,'p5')"><span class="sb-n">06</span>Kif Overview &amp; Trior</div>
+    <div class="sb-item" onclick="nav(this,'p6')"><span class="sb-n">07</span>Trior Disassembly</div>
+    <div class="sb-item" onclick="nav(this,'p7')"><span class="sb-n">08</span>Trior Assembly</div>
+    <div class="sb-item" onclick="nav(this,'p8')"><span class="sb-n">09</span>Kif Flector</div>
+    <div class="sb-item" onclick="nav(this,'p9')"><span class="sb-n">10</span>Kif Duofix</div>
+
+    <div class="sb-grp">Parts Ordering</div>
+    <div class="sb-item" onclick="nav(this,'p10')"><span class="sb-n">11</span>Ordering Springs</div>
+    <div class="sb-item" onclick="nav(this,'p11')"><span class="sb-n">12</span>Ordering Endstones &amp; Jewels</div>
+    <div class="sb-item" onclick="nav(this,'p12')"><span class="sb-n">13</span>Incabloc vs. Kif — Summary</div>
+  </nav>
+  <div class="sb-foot"><p>Shock Protected Jewels<br>Incabloc · Kif Trior · Flector<br>Duofix · Parts Reference</p></div>
+</aside>
+
+<main class="main">
+
+<!-- 01 WHY SHOCK PROTECTION -->
+<div class="panel active" id="p0">
+  <div class="ph">
+    <div class="ph-eye">Overview · Section 01</div>
+    <h1>Why <em>Shock Protection?</em></h1>
+    <p>The balance assembly is the heaviest, fastest-spinning component in the movement — but it turns on the most delicate pivots. Before shock protection became standard, broken balance pivots were the single most common watch repair.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-tag">THE PROBLEM</span><div class="sdiv-line"></div><span class="sdiv-text">The Design Conflict</span></div>
+  <p class="prose">The balance wheel needs to be relatively heavy and large in diameter to provide enough rotational inertia for stable timekeeping. But to minimise friction, its staff pivots must be extremely fine — with coned tips. This combination of heavy wheel and fine coned pivots makes the balance staff <strong>highly susceptible to breakage from shock</strong>. A drop, a knock, or even a sudden arm movement can break a pivot that was running perfectly.</p>
+
+  <div class="cg">
+    <div class="cg-card"><div class="cg-head ruby">Before Shock Protection</div><div class="cg-body">Balance staff replacement was <strong>the most common repair</strong> a watchmaker performed. The pivot would snap, the watch would stop, and the entire staff had to be replaced — a skilled and time-consuming operation. Ordinary use was enough to break pivots.</div></div>
+    <div class="cg-card"><div class="cg-head sage">After Shock Protection</div><div class="cg-body">The pivot can now deflect under impact — moving the jewel assembly out of the way — then return to its exact running position. <strong>Balance staff breakage became rare</strong>. Shock protection is now fitted to virtually all quality watches.</div></div>
+    <div class="cg-card"><div class="cg-head gold">The Key Principle</div><div class="cg-body">During a shock, the only force applied to the pivot is what is needed to <strong>overcome the spring's retaining force</strong>. Without this, the full shock force would travel directly through the pivot — and snap it.</div></div>
+  </div>
+
+  <div class="warn">
+    <span class="warn-icon">⚠</span>
+    <div class="warn-text"><strong>Check shock system availability before accepting work.</strong> When buying obscure movements or taking in non-runners, always identify the shock protection system fitted and verify that replacement parts are still available. Many non-runners are non-runners specifically because a broken shock system cannot be sourced — the only option becomes buying a donor movement.</div>
+  </div>
+</div>
+
+<!-- 02 HOW ALL SYSTEMS WORK -->
+<div class="panel" id="p1">
+  <div class="ph">
+    <div class="ph-eye">Overview · Section 02</div>
+    <h1>How <em>All Systems Work</em></h1>
+    <p>Despite many different brand names and spring designs, every shock protection system operates on the same fundamental principle. Once you understand one, you understand the logic of all of them.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-tag">UNIVERSAL</span><div class="sdiv-line"></div><span class="sdiv-text">Common Mechanism</span></div>
+  <p class="prose">In every shock system, the balance hole jewel and endstone are mounted in a <strong>movable chaton</strong> held inside a <strong>fixed block</strong> by a <strong>retaining spring</strong>. The block is pressed or clipped into the plate or cock. Under normal running, the spring holds the chaton firmly in position. When a shock occurs, the pivot pushes the chaton out of position against the spring force — deflecting instead of breaking. When the shock passes, the spring snaps the chaton back to its exact running position.</p>
+
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">Fixed Block</div><div class="step-detail">Pressed or clipped into the plate or cock. Provides the housing for the entire assembly. The sloping interior walls of the block interact with the sloping outer surface of the chaton to centre and vertically position the chaton precisely.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Movable Chaton</div><div class="step-detail">Contains both jewels — the balance hole jewel (pressed in) and the endstone (which sits freely in a sink). The chaton's conical or sloping sides locate it in the block. Under shock it moves; under spring force it returns.</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-title">Retaining Spring</div><div class="step-detail">Holds the chaton firmly under normal conditions. Must be precisely balanced: <strong>too stiff — the chaton cannot deflect enough</strong> during a shock, so the pivot still breaks. <strong>Too soft — the chaton moves during normal running</strong>, allowing the watch to run erratically or the chaton to fail to return to position quickly enough. These components are meticulously designed to hit this balance exactly.</div></div></div>
+  </div>
+
+  <div class="callout gold"><strong>Spring balance is everything.</strong> The retaining spring must be stiff enough to hold the chaton precisely during normal running and return it instantly after a shock — yet compliant enough to yield and protect the pivot during impact. This is a very precise specification. Never substitute a spring of the wrong size or stiffness.</div>
+</div>
+
+<!-- 03 INCABLOC COMPONENTS -->
+<div class="panel" id="p2">
+  <div class="ph">
+    <div class="ph-eye">Incabloc System · Section 03</div>
+    <h1>Incabloc <em>Components</em></h1>
+    <p>The Incabloc system, widely adopted in the mid-20th century, provides protection against shocks in all directions — end-on, lateral, and at any angle. It remains the most widely used shock protection system today.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-tag">COMPONENTS</span><div class="sdiv-line"></div><span class="sdiv-text">Five Parts of the Incabloc Assembly</span></div>
+  <table class="ct">
+    <thead><tr><th>Part</th><th>Description &amp; Function</th></tr></thead>
+    <tbody>
+      <tr><td>Block</td><td>Friction fitted into the cock or plate. Houses all other components. The chaton sits within the block; the retaining spring anchors inside a groove in the block. <strong>Can also be secured by a U-shaped retaining clip</strong> rather than friction fit.</td></tr>
+      <tr><td>Double-Stepped Chaton</td><td>Both jewels are mounted in this single unit. The double-step design ensures proper spacing between the balance hole jewel and the endstone — <strong>approximately 0.02mm</strong> — which is critical for the oil to form and hold correctly around the pivot.</td></tr>
+      <tr><td>Balance Hole Jewel</td><td>Pressed into the chaton. Features an <strong>olive-shaped centre hole</strong> — convex on the inside bore — which maintains the pivot in position while reducing friction in vertical positions.</td></tr>
+      <tr><td>Endstone (Cap Jewel)</td><td>The surface on which the balance pivot tip rotates when the movement is horizontal. The pivot rests on the endstone rather than pressing sideways into the hole jewel when face-up.</td></tr>
+      <tr><td>Retaining Spring</td><td>Held in the block; applies pressure to hold the chaton securely. Lyre-shaped with a pivoting hinge and two arms. During servicing, the arms unclip and the spring pivots away, freeing the chaton.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sdiv"><span class="sdiv-tag">INSTALLATION</span><div class="sdiv-line"></div><span class="sdiv-text">Upper and Lower Incabloc Positions</span></div>
+  <div class="cg">
+    <div class="cg-card"><div class="cg-head ruby">Upper (Balance Cock)</div><div class="cg-body">The Incabloc setting in the balance cock is either <strong>friction fitted and pressed into position</strong> or secured by a U-shaped retaining clip. The upper setting is more accessible during servicing.</div></div>
+    <div class="cg-card"><div class="cg-head ruby">Lower (Bottom Plate)</div><div class="cg-body">Typically <strong>pressed into the bottom plate</strong>. Must be removed if the retaining spring is broken — the lower setting does not have the same access as the upper. Press from the correct side with the appropriate jewelling tool.</div></div>
+  </div>
+</div>
+
+<!-- 04 INCABLOC SPRING -->
+<div class="panel" id="p3">
+  <div class="ph">
+    <div class="ph-eye">Incabloc System · Section 04</div>
+    <h1>The Incabloc <em>Retaining Spring</em></h1>
+    <p>The lyre-shaped Incabloc spring is the heart of the system — and its servicing is the main routine maintenance task on Incabloc settings.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-tag">DESIGN</span><div class="sdiv-line"></div><span class="sdiv-text">Lyre Shape and Function</span></div>
+  <p class="prose">The Incabloc spring is named for its <strong>lyre shape</strong> — a distinctive twin-arm form with a pivoting hinge at one end. The two arms apply pressure down onto the endstone, holding the chaton firmly in the block. Each arm fits into a notch on the block to prevent the spring from rotating or lifting.</p>
+
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">→</div><div class="step-body"><div class="step-title">Servicing Access</div><div class="step-detail">During servicing, the two arms can be <strong>unclipped from the notches</strong>. The spring then pivots away on its hinge — it does not need to be fully removed. With the spring swung aside, the chaton (with both jewels) can be lifted out for cleaning and oiling, then replaced and the spring swung back and clipped into the notches.</div></div></div>
+    <div class="step-item"><div class="step-num">→</div><div class="step-body"><div class="step-title">Robustness</div><div class="step-detail">The Incabloc system is <strong>fairly robust</strong> and damage during normal running is rare. The spring is the most likely component to be damaged — usually from incorrect tool use during servicing or from a severe impact that fully compresses the assembly.</div></div></div>
+    <div class="step-item"><div class="step-num">→</div><div class="step-body"><div class="step-title">Replacement Units</div><div class="step-detail">Incabloc settings are available as <strong>complete units, press-in units, or clip-in units</strong>. This variety makes sourcing practical — the format depends on which version the movement uses.</div></div></div>
+  </div>
+</div>
+
+<!-- 05 END SHAKE & DIAGNOSIS -->
+<div class="panel" id="p4">
+  <div class="ph">
+    <div class="ph-eye">Incabloc System · Section 05</div>
+    <h1>End Shake <em>&amp; Diagnosis</em></h1>
+    <p>Because the balance hole jewel is press-fitted into the chaton, end shake adjustment was not intended as a field operation. However, the system provides clear diagnostic signals when something is wrong.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-tag">MATCHING</span><div class="sdiv-line"></div><span class="sdiv-text">Balance and Pallet Fork End Shake Must Match</span></div>
+  <p class="prose">The end shake of the balance wheel and the pallet fork <strong>should be identical</strong>. This keeps the clearances consistent between the impulse table, the jewel in the pallet fork slot, and the guard pin. If these are mismatched, the geometry of the escapement is compromised.</p>
+
+  <table class="ct">
+    <thead><tr><th>Condition</th><th>Cause</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td>Too much end shake</td><td>Balance pivot worn flat — creates a divot in the endstone over time</td><td>Excessive play in the axial direction; pivot no longer centred correctly on the endstone</td></tr>
+      <tr><td>Too little end shake</td><td>Pivot is too long, or the block has been pressed in too far during installation</td><td>Pivot binds axially; amplitude suffers; setting may need adjustment</td></tr>
+      <tr><td>Correct end shake</td><td>Properly sized pivot and correctly positioned block</td><td>Pivot runs freely in all orientations with consistent geometry</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><strong>Small adjustments are possible.</strong> Very small adjustments to the block's position can be made if necessary — the block can be pressed slightly further in or out. This is a last resort and requires care: the block must seat correctly and the chaton must still be able to deflect under shock.</div>
+  <div class="callout gold"><strong>Worn pivot + divot in endstone = replace the endstone.</strong> A divot worn into the endstone is a sign the pivot has been running flat rather than on its coned tip for some time. Both the endstone and potentially the pivot need attention — not just the setting.</div>
+</div>
+
+<!-- 06 KIF OVERVIEW & TRIOR -->
+<div class="panel" id="p5">
+  <div class="ph">
+    <div class="ph-eye">Kif System · Section 06</div>
+    <h1>Kif Overview <em>&amp; Trior</em></h1>
+    <p>Manufactured by Parechoc in Switzerland, the Kif system is the main alternative to Incabloc. The block is fixed; the chaton is movable and held by one of several spring styles — all identified by specific Kif spring names.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-tag">STRUCTURE</span><div class="sdiv-line"></div><span class="sdiv-text">Kif System Components</span></div>
+  <p class="prose">The Kif assembly consists of a <strong>fixed block</strong> pressed into the plate or cock, a <strong>movable chaton</strong>, and a <strong>retaining spring</strong>. Both the upper and lower blocks share identical designs. The fixed block is friction-tight and can be installed with a standard jewelling tool. The recessed block accommodates the chaton inside it.</p>
+
+  <div class="sdiv"><span class="sdiv-tag">TRIOR</span><div class="sdiv-line"></div><span class="sdiv-text">Kif Trior — Three-Tongue Spring</span></div>
+  <p class="prose">The Trior is the most common Kif spring type. Its chaton features <strong>conical sloping sides with a step near the bottom</strong>, allowing it to seat into a recess in the fixed block — the sloping sides locating against a rounded shoulder. The endstone fits freely into a sink in the chaton (not pressed in). The balance hole jewel is pressed into the movable chaton.</p>
+
+  <div class="cg">
+    <div class="cg-card"><div class="cg-head ruby">Trior Spring Design</div><div class="cg-body">The Trior spring has <strong>three tongues</strong> that pass over the endstone, applying uniform pressure around its full circumference. Each tongue has a horn (finger) at its end that fits into a matching cutout in the block.</div></div>
+    <div class="cg-card"><div class="cg-head ruby">Locking Mechanism</div><div class="cg-body">After the three horns are placed in the cutouts, the spring is <strong>rotated</strong> — either direction — so the horns rotate into a groove in the block, locking the spring in place. Uniform pressure on the endstone from all three tongues is what makes the assembly reliable.</div></div>
+    <div class="cg-card"><div class="cg-head gold">Spring Identification</div><div class="cg-body">There are many different Kif spring styles, each identified by a specific name. Always identify the correct spring type before ordering replacements — size and tongue geometry vary between types.</div></div>
+  </div>
+</div>
+
+<!-- 07 TRIOR DISASSEMBLY -->
+<div class="panel" id="p6">
+  <div class="ph">
+    <div class="ph-eye">Kif System · Section 07</div>
+    <h1>Trior <em>Disassembly</em></h1>
+    <p>Removing the Kif Trior spring is straightforward. The challenge is controlling the spring as it comes free — not losing it or the endstone.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">Two Pairs of Tweezers Required</div><div class="step-detail">Use one pair of tweezers to <strong>rotate the spring</strong> until the three horns are freed from their groove and align with the cutout notches. Use a <strong>second pair of tweezers touching the endstone</strong> — this prevents the spring from flying free as tension releases. The spring is under tension and will jump if not controlled.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Lift Away the Spring</div><div class="step-detail">Once the horns are free of the groove and sitting in the open cutouts, the spring can be lifted away. The endstone can then be removed from the chaton sink. The chaton can now be lifted from the block for cleaning.</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-title">Clean All Components Separately</div><div class="step-detail">The block, chaton, endstone, and spring all benefit from individual cleaning. The spring is too delicate for ultrasonic — clean in a rinse bath or by hand. The chaton and block go through normal cleaning.</div></div></div>
+  </div>
+
+  <div class="warn"><span class="warn-icon">⚠</span><div class="warn-text"><strong>The spring is under tension when the horns are seated.</strong> Always use the second pair of tweezers on the endstone to prevent the spring from springing away during removal. A flying Trior spring in a watch is difficult to recover — and easy to confuse with other parts if it lands among them.</div></div>
+</div>
+
+<!-- 08 TRIOR ASSEMBLY -->
+<div class="panel" id="p7">
+  <div class="ph">
+    <div class="ph-eye">Kif System · Section 08</div>
+    <h1>Trior <em>Assembly</em></h1>
+    <p>Reinstalling the Trior spring is more involved than removal — a tool is required to push all three tongues down simultaneously so they can be rotated into the locking groove.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-tag">TOOLS</span><div class="sdiv-line"></div><span class="sdiv-text">Purpose-Made or Shop-Made</span></div>
+  <div class="cg">
+    <div class="cg-card"><div class="cg-head gold">Commercial Tool</div><div class="cg-body">A set of pushers designed to press down on all three tongues simultaneously. Available in three sizes — measured from the outside of the block's shoulder. Select the correct pusher for the block diameter before starting.</div></div>
+    <div class="cg-card"><div class="cg-head sage">Shop-Made Pegwood Tool</div><div class="cg-body">A piece of pegwood shaped with a <strong>hollow recess in its tip</strong>: the edges of the recess push down on the tongue edges while the hollow centre provides clearance for the endstone jewel. A practical alternative that any watchmaker can make.</div></div>
+  </div>
+
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">Fit Horns into Notches</div><div class="step-detail">Place the endstone into the chaton sink, then fit the spring over the assembly. Fit the <strong>outside horn or finger of the spring into the cutout notches</strong> in the block as a starting point. The spring should be resting in position but not yet locked.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Press Down and Rotate</div><div class="step-detail">Hold the tool <strong>in an upright position</strong> over the spring. Press down with the tool and simultaneously <strong>twist the spring</strong> until you feel the edges of the tool engaging the tongues and turning them along. The tongues must be pressed down below the groove level before they can rotate into it.</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-title">Verify Correct Seating</div><div class="step-detail">The spring is correctly in position when <strong>all three horns are at equal distance from the cutout notches</strong> — meaning they are fully in the groove, not halfway. Check by gently trying to rotate the spring — it should be locked and not rotate.</div></div></div>
+  </div>
+</div>
+
+<!-- 09 KIF FLECTOR -->
+<div class="panel" id="p8">
+  <div class="ph">
+    <div class="ph-eye">Kif System · Section 09</div>
+    <h1>Kif <em>Flector</em></h1>
+    <p>The Kif Flector is a hinged-spring variant. It shares the Trior's basic geometry but uses a single horn and hinge rather than three tongues — and critically, the spring stays attached to the block during chaton removal.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-tag">DESIGN</span><div class="sdiv-line"></div><span class="sdiv-text">Differences from the Trior</span></div>
+  <div class="cg">
+    <div class="cg-card"><div class="cg-head ruby">One Horn, One Notch</div><div class="cg-body">Unlike the Trior with three horns and three notches, the Flector has <strong>a single horn and a single notch</strong>. Pressure is applied at one point rather than distributed around the circumference.</div></div>
+    <div class="cg-card"><div class="cg-head ruby">Hinged Spring</div><div class="cg-body">The spring is <strong>hinged on a hinge retainer</strong> inserted into the block. A folded-over tab slides along the retaining rod when opening or closing. The hinge keeps the spring attached to the block — it cannot fly away during disassembly.</div></div>
+    <div class="cg-card"><div class="cg-head sage">Advantage</div><div class="cg-body">Because the spring remains hinged to the seating during chaton removal, it cannot be lost. This makes Flector servicing less risky than Trior servicing for beginners.</div></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-tag">DISASSEMBLY</span><div class="sdiv-line"></div><span class="sdiv-text">Removing the Flector Spring</span></div>
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">Engage Tweezers in the Spring Slot</div><div class="step-detail">Using fine-tip tweezers, place the tip in the <strong>slot of the spring</strong>. This is the designated engagement point — do not force the tweezers against any other part of the spring.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Rotate Approximately 45°</div><div class="step-detail">Rotate the tweezers about <strong>45° in either direction</strong> — this disengages the horn from its notch in the block.</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-title">Lift the Spring</div><div class="step-detail">Lift the spring away. A second pair of tweezers can assist the folded-over hinge tab as it moves along the retaining rod. The spring remains attached at the hinge — it cannot be fully separated from the block without removing the hinge retainer.</div></div></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-tag">REASSEMBLY</span><div class="sdiv-line"></div><span class="sdiv-text">Reinstalling the Flector Spring</span></div>
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">Fit Jewelled Setting and Endstone</div><div class="step-detail">Place the chaton with the balance hole jewel into the block. Place the endstone into the chaton sink.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Hinge the Spring Over the Pin</div><div class="step-detail">Lower the spring over the endstone. Guide the <strong>lip into the groove by rotating approximately 45°</strong> in the direction opposite to disassembly — the horn will seat into the same notch it came from.</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-title">Press and Seat the Horn</div><div class="step-detail">With the tweezers tip in the slot, press down the horn and rotate until it locks into the groove. Verify it is seated — the spring should feel firm and not rotate freely.</div></div></div>
+  </div>
+</div>
+
+<!-- 10 KIF DUOFIX -->
+<div class="panel" id="p9">
+  <div class="ph">
+    <div class="ph-eye">Kif System · Section 10</div>
+    <h1>Kif <em>Duofix</em></h1>
+    <p>The Kif Duofix — and Seiko's equivalent Diafix — are the simplest shock systems to service. The key is straightforward: do not remove the key from the block.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <p class="prose">The Duofix and Diafix share essentially the same design. They are easy to remove and install provided the <strong>key is not removed from the block</strong>. The key is the retaining element that holds the chaton in place — removing it makes reassembly significantly more difficult and risks losing or damaging the component.</p>
+
+  <div class="callout"><strong>Duofix / Diafix rule:</strong> Do not remove the key from the block during normal servicing. The chaton can be accessed and cleaned without removing the key. The entire block assembly can be replaced as a unit if any component is damaged.</div>
+
+  <div class="cg">
+    <div class="cg-card"><div class="cg-head gold">Kif Duofix</div><div class="cg-body">Swiss-made. Same operating principle as the Seiko Diafix. Simple key-in-block retention. Both upper and lower settings use the same design. Removal and installation straightforward if the key is left in place.</div></div>
+    <div class="cg-card"><div class="cg-head gold">Seiko Diafix</div><div class="cg-body">Seiko's equivalent of the Duofix. Common across many Seiko movements from the mid-20th century. The design is robust and parts remain widely available. Same servicing rule applies: leave the key in the block.</div></div>
+  </div>
+</div>
+
+<!-- 11 ORDERING SPRINGS -->
+<div class="panel" id="p10">
+  <div class="ph">
+    <div class="ph-eye">Parts Ordering · Section 11</div>
+    <h1>Ordering <em>Springs</em></h1>
+    <p>Springs and endstones are the two parts most commonly needing replacement in shock settings. Using Kif parts as the example — the same measurement approach applies to most other systems.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-tag">SPRINGS</span><div class="sdiv-line"></div><span class="sdiv-text">Measuring and Ordering Kif Springs</span></div>
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">Measure the Spring</div><div class="step-detail">Measure the spring itself with a digital micrometer. As an example: a Kif Trior spring measuring <strong>1.53mm</strong> corresponds to a <strong>1-3 KIF spring</strong> in the reference chart. The measurement maps directly to the part number using the published spring measuring chart.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Use the Spring Measuring Chart</div><div class="step-detail">The chart converts the measured dimension to the correct part designation. The designation (e.g. "1.3") is then used to locate the spring in a supplier catalogue such as Cousins UK. Multiple spring sizes are typically shown in a table — locate the corresponding size row and order from there.</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-title">Verify the Spring Type</div><div class="step-detail">Kif springs come in multiple styles — Trior, Flector, Duofix, and others. The measuring chart is specific to the spring type. Make sure you are using the correct chart section for the spring you are replacing.</div></div></div>
+  </div>
+
+  <div class="callout"><strong>The KIF parts chart in the Bestfit catalogue</strong> provides a complete reference for vintage shock system parts across most manufacturers. For vintage movements especially, consult this before attempting to order from a general catalogue entry.</div>
+</div>
+
+<!-- 12 ORDERING ENDSTONES & JEWELS -->
+<div class="panel" id="p11">
+  <div class="ph">
+    <div class="ph-eye">Parts Ordering · Section 12</div>
+    <h1>Ordering Endstones <em>&amp; Jewels</em></h1>
+    <p>Endstones and balance hole jewels require different measurement approaches. Endstones can usually be sourced individually; jewels often mean replacing the entire block.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="parts-box">
+    <div class="parts-title">Measuring for Replacement Parts</div>
+    <div class="parts-row">
+      <div class="parts-item">
+        <div class="parts-label">Endstones</div>
+        <div class="parts-desc">Measure <strong>both width and thickness</strong>. Example: an endstone measuring <strong>0.9mm wide × 0.13mm thick</strong> corresponds to size <strong>508</strong> in the Kif endstone chart. Match both dimensions — width alone is insufficient as multiple endstones share the same width with different thicknesses.</div>
+      </div>
+      <div class="parts-item">
+        <div class="parts-label">Balance Hole Jewels</div>
+        <div class="parts-desc">Measure the <strong>width and thickness of the chaton</strong> to determine the correct jewel size. Because sourcing the exact jewel size can be difficult, and because the chaton setting is often damaged in other ways when the jewel is, the preferred approach is to <strong>replace the entire block assembly</strong> rather than the jewel alone.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout"><strong>General rule for balance hole jewels:</strong> Replace the block as a unit. The chances are high that when a jewel needs replacement, the setting has been damaged in other ways too — and sourcing the exact individual jewel size is harder than sourcing the complete assembly. Block replacement is more reliable and usually not significantly more expensive.</div>
+
+  <div class="callout gold"><strong>When ordering from Cousins UK or similar suppliers:</strong> Look up the endstone size number (e.g. "508") or the spring designation (e.g. "1.3") in their catalogue listing. Both the Kif endstone chart and the spring measuring chart map directly to catalogue numbers. If in doubt, the Bestfit catalogue vintage listing is the most comprehensive reference for identifying obscure shock system parts.</div>
+</div>
+
+<!-- 13 SUMMARY COMPARISON -->
+<div class="panel" id="p12">
+  <div class="ph">
+    <div class="ph-eye">Summary · Section 13</div>
+    <h1>Incabloc vs. Kif <em>— Summary</em></h1>
+    <p>Both systems protect the balance pivot by the same mechanism. Their differences are in spring design, servicing procedure, and spring identification.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="cmpr">
+    <div class="cmpr-card">
+      <div class="cmpr-head"><div class="cmpr-dot" style="background:var(--ruby);"></div>Incabloc</div>
+      <div class="cmpr-body"><ul>
+        <li>Lyre-shaped spring with pivoting hinge</li>
+        <li>Two arms clip into notches on the block</li>
+        <li>Spring pivots away for servicing — does not need to be fully removed</li>
+        <li>Upper setting: friction fit or U-clip in balance cock</li>
+        <li>Lower setting: pressed into bottom plate; must be extracted if spring is broken</li>
+        <li>Available as complete units, press-in, or clip-in</li>
+        <li>Widely used — most common system globally</li>
+      </ul></div>
+    </div>
+    <div class="cmpr-card">
+      <div class="cmpr-head"><div class="cmpr-dot" style="background:var(--gold);"></div>Kif</div>
+      <div class="cmpr-body"><ul>
+        <li>Three spring types: <strong>Trior</strong> (3 tongues), <strong>Flector</strong> (hinged, 1 tongue), <strong>Duofix</strong> (key retention)</li>
+        <li>Trior: three tongues rotate into block groove — tool required for reassembly</li>
+        <li>Flector: hinged spring stays attached to block — safer during servicing</li>
+        <li>Duofix / Diafix: key must not be removed from block</li>
+        <li>Upper and lower blocks are identical in design</li>
+        <li>Springs identified by name and measured dimension</li>
+        <li>Made by Parechoc, Switzerland</li>
+      </ul></div>
+    </div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-tag">UNIVERSAL</span><div class="sdiv-line"></div><span class="sdiv-text">What They Share</span></div>
+  <div class="cg">
+    <div class="cg-card"><div class="cg-head sage">Same Operating Principle</div><div class="cg-body">Fixed block. Movable chaton with both jewels. Retaining spring. The pivot deflects the chaton under shock; the spring returns it. Both protect against longitudinal and lateral shocks.</div></div>
+    <div class="cg-card"><div class="cg-head sage">Same Chaton Design</div><div class="cg-body">Sloping outer surfaces on the chaton interact with sloping inner surfaces of the block to centre the chaton and set its vertical position. This centering is what returns the assembly precisely to running position after a shock.</div></div>
+    <div class="cg-card"><div class="cg-head sage">Same Jewel Types</div><div class="cg-body">Olive-hole balance jewel pressed into the chaton. Endstone sitting freely in a sink in the chaton. Spacing between the two jewels is approximately 0.02mm — same specification as non-shock assemblies.</div></div>
+    <div class="cg-card"><div class="cg-head sage">Same Servicing Priority</div><div class="cg-body">Both require the retaining spring to be in correct condition and the endstone to be undamaged. Both have replaceable parts available — springs, endstones, and complete block assemblies.</div></div>
+  </div>
+</div>
+
+</main>
+</div>
+<script>
+function nav(el,id){
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+  if(window.innerWidth<=820)document.querySelector('.sidebar').classList.remove('open');
+  document.querySelector('.main').scrollTop=0;
+}
+</script>
+</body>
+</html>
